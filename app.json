@@ -1,15 +1,19 @@
 {
   "expo": {
-    "name": "Chatbot-App",
+    "name": "AIDME",
     "slug": "Chatbot-App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/aidme.png",
     "scheme": "chatbotapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "Allow $(PRODUCT_NAME) to use speech recognition.",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to use the microphone."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +28,8 @@
       "webView": {
         "allowFileAccess": true,
         "allowUniversalAccessFromFileURLs": true
-      }
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "output": "static",
@@ -50,6 +55,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "051c42b1-8e69-4b1d-8645-9459a3e8ae5f"
+      }
     }
   }
 }
