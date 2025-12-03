@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     width: 10,
-    height: 20,
+    height: 40,
     backgroundColor: colors.primary,
     borderRadius: 3,
   },
