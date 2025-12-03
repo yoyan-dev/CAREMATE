@@ -4,6 +4,7 @@ import { useVoiceAssistant } from "@/hooks/use-voice-assistance";
 import { colors } from "@/theme/color";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -26,6 +27,14 @@ export default function ChatbotScreen() {
     stopListening,
   } = useVoiceAssistant();
 
+  const bars = useRef([
+    new Animated.Value(1),
+    new Animated.Value(1),
+    new Animated.Value(1),
+    new Animated.Value(1),
+    new Animated.Value(1),
+  ]).current;
+
   const [input, setInput] = useState("");
   const flatRef = useRef<FlatList<any> | null>(null);
 
@@ -42,6 +51,34 @@ export default function ChatbotScreen() {
   };
 
   const renderItem = ({ item }: any) => <ChatBubble message={item} />;
+
+  useEffect(() => {
+    if (isTalking) {
+      animateBars();
+    } else {
+      // Reset bars when not speaking
+      bars.forEach((bar) => bar.setValue(1));
+    }
+  }, [isTalking]);
+
+  const animateBars = () => {
+    bars.forEach((bar, index) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(bar, {
+            toValue: Math.random() * 1.5 + 0.5, // random height
+            duration: 200 + index * 50,
+            useNativeDriver: true,
+          }),
+          Animated.timing(bar, {
+            toValue: Math.random() * 1.5 + 0.5,
+            duration: 200 + index * 50,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -91,6 +128,23 @@ export default function ChatbotScreen() {
           </View>
         )}
       </View>
+      {isTalking && (
+        <Animated.View style={styles.speakingOverlay}>
+          <View style={styles.barsContainer}>
+            {bars.map((bar, i) => (
+              <Animated.View
+                key={i}
+                style={[
+                  styles.bar,
+                  {
+                    transform: [{ scaleY: bar }],
+                  },
+                ]}
+              />
+            ))}
+          </View>
+        </Animated.View>
+      )}
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -233,5 +287,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderTopWidth: 0.5,
     borderColor: "#eee",
+  },
+  speakingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.49)", // semi-transparent overlay
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  barsContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    height: 50,
+    width: 120,
+    justifyContent: "space-between",
+  },
+  bar: {
+    width: 10,
+    height: 20,
+    backgroundColor: colors.primary,
+    borderRadius: 3,
   },
 });
