@@ -15,18 +15,17 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.heroContainer}>
-        <Text style={styles.header}>Welcome to AIDME 🩺</Text>
+        <Text style={styles.header}>Welcome to AIDME</Text>
         <Text style={styles.subHeader}>
           Your AI-powered first aid assistant
         </Text>
+      </View>
 
+      <View style={styles.introCard}>
         <Image
           source={require("../../assets/images/icon.png")}
           style={styles.heroImage}
         />
-      </View>
-
-      <View style={styles.introCard}>
         <Text style={styles.introText}>
           Hi there! I'm Aidme, your intelligent first aid buddy. How can I
           assist you today?
@@ -48,7 +47,10 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: colors.background,
     alignItems: "center",
-    height: 1000,
+    minHeight: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-evenly",
   },
 
   heroContainer: {
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "bold",
     color: colors.primary,
     textAlign: "center",
@@ -71,31 +73,27 @@ const styles = StyleSheet.create({
   },
 
   heroImage: {
-    width: 140,
-    height: 140,
-    marginTop: 20,
-    borderRadius: 20,
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+    borderRadius: 100,
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
+    margin: 5,
   },
 
   introCard: {
     marginTop: 25,
-    backgroundColor: "#fff",
+    alignItems: "center",
     borderRadius: 20,
     padding: 20,
     width: "100%",
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
   },
 
   introText: {
-    fontSize: 16,
+    fontSize: 20,
     color: colors.textDark,
     textAlign: "center",
     lineHeight: 22,
