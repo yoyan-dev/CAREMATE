@@ -23,7 +23,7 @@ export default function HomeScreen() {
 
       <View style={styles.introCard}>
         <Image
-          source={require("../../assets/images/icon.png")}
+          source={require("../../assets/images/aidme.png")}
           style={styles.heroImage}
         />
         <Text style={styles.introText}>
