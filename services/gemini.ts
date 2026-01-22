@@ -1,9 +1,9 @@
 import axios from "axios";
 import { Message } from "../types";
 
-const MODEL = process.env.EXPO_PUBLIC_GEMINI_MODEL || "gemini-2.0-flash";
+const MODEL = process.env.EXPO_PUBLIC_GEMINI_MODEL || "gemini-2.5-flash-lite";
 const API_KEY =
-  process.env.GEMINI_API_KEY || "AIzaSyCmBOboO8nQebxKN2ihpF3_yA6ihAOwLOA";
+  process.env.GEMINI_API_KEY || "AIzaSyC4LIVRUSwvc5zq8T9IXDC6uw69yhuja14";
 
 if (!API_KEY) {
   console.warn("Missing EXPO_PUBLIC_GEMINI_API_KEY");

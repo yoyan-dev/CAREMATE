@@ -21,7 +21,7 @@ export function useVoiceAssistant() {
         if (savedMessages.length === 0) {
           // default welcome message
           const welcome: Message = {
-            id: Math.floor(Math.random() * 100000).toString(),
+            id: Math.floor(Math.random() * 10000000000000).toString(),
             role: "assistant",
             text: "Hello! I can give general health & first aid information. I do not diagnose or prescribe. How can I help?",
             time: new Date().toISOString(),
@@ -53,7 +53,7 @@ export function useVoiceAssistant() {
   const sendMessage = useCallback(
     async (text: string) => {
       const userMsg: Message = {
-        id: Math.floor(Math.random() * 100000).toString(),
+        id: Math.floor(Math.random() * 10000000000000).toString(),
         role: "user",
         text,
         time: new Date().toISOString(),
@@ -67,7 +67,7 @@ export function useVoiceAssistant() {
       // AI response
       const aiText = await askGemini([...messages, userMsg]);
       const aiMsg: Message = {
-        id: Math.floor(Math.random() * 100000).toString(),
+        id: Math.floor(Math.random() * 10000000000000).toString(),
         role: "assistant",
         text: aiText,
         time: new Date().toISOString(),
@@ -76,14 +76,14 @@ export function useVoiceAssistant() {
       setMessages((prev) => [...prev, aiMsg]);
 
       // TTS
-      setIsTalking(true);
       Speech.speak(aiText, {
+        onStart: () => setIsTalking(true),
         onDone: () => setIsTalking(false),
       });
 
       setIsThinking(false);
     },
-    [messages]
+    [messages],
   );
 
   const startListening = useCallback(async () => {

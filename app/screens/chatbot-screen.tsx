@@ -1,10 +1,9 @@
-// screens/HomeScreen.tsx
 import ChatBubble from "@/components/chat/chat-bubble";
+import TalkingAvatar from "@/components/chat/talking-avatar";
 import { useVoiceAssistant } from "@/hooks/use-voice-assistance";
 import { colors } from "@/theme/color";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -27,21 +26,11 @@ export default function ChatbotScreen() {
     stopListening,
   } = useVoiceAssistant();
 
-  const bars = useRef([
-    new Animated.Value(1),
-    new Animated.Value(1),
-    new Animated.Value(1),
-    new Animated.Value(1),
-    new Animated.Value(1),
-  ]).current;
-
   const [input, setInput] = useState("");
   const flatRef = useRef<FlatList<any> | null>(null);
 
   useEffect(() => {
-    if (flatRef.current) {
-      flatRef.current.scrollToEnd({ animated: true });
-    }
+    flatRef.current?.scrollToEnd({ animated: true });
   }, [messages, isThinking, isTalking]);
 
   const onSend = () => {
@@ -51,34 +40,6 @@ export default function ChatbotScreen() {
   };
 
   const renderItem = ({ item }: any) => <ChatBubble message={item} />;
-
-  useEffect(() => {
-    if (isTalking) {
-      animateBars();
-    } else {
-      // Reset bars when not speaking
-      bars.forEach((bar) => bar.setValue(1));
-    }
-  }, [isTalking]);
-
-  const animateBars = () => {
-    bars.forEach((bar, index) => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(bar, {
-            toValue: Math.random() * 1.5 + 0.5, // random height
-            duration: 200 + index * 50,
-            useNativeDriver: true,
-          }),
-          Animated.timing(bar, {
-            toValue: Math.random() * 1.5 + 0.5,
-            duration: 200 + index * 50,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    });
-  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -98,15 +59,10 @@ export default function ChatbotScreen() {
       </View>
 
       <View style={styles.avatarRow}>
-        {/* <TalkingAvatar
-          isTalking={isTalking}
-          size={110}
-          idleSource={require("../assets/lottie/idle.json")}
-          talkingSource={require("../assets/lottie/talking.json")}
-        /> */}
-        <View style={{ marginLeft: 12 }}>
+        <TalkingAvatar isTalking={isTalking} size={110} />
+        <View style={{ marginLeft: 12, justifyContent: "center" }}>
           <Text style={styles.welcome}>Hi — I'm your assistant</Text>
-          <Text style={styles.small}>Say "What to do for a burn?"</Text>
+          <Text style={styles.small}>Say “What to do for a burn?”</Text>
         </View>
       </View>
 
@@ -121,30 +77,12 @@ export default function ChatbotScreen() {
             flatRef.current?.scrollToEnd({ animated: true })
           }
         />
-
         {isThinking && (
           <View style={styles.typingRow}>
             <Text style={{ color: "#444" }}>AI is thinking...</Text>
           </View>
         )}
       </View>
-      {isTalking && (
-        <Animated.View style={styles.speakingOverlay}>
-          <View style={styles.barsContainer}>
-            {bars.map((bar, i) => (
-              <Animated.View
-                key={i}
-                style={[
-                  styles.bar,
-                  {
-                    transform: [{ scaleY: bar }],
-                  },
-                ]}
-              />
-            ))}
-          </View>
-        </Animated.View>
-      )}
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -182,9 +120,6 @@ export default function ChatbotScreen() {
           immediately.
         </Text>
       </View>
-      {/* {error ? (
-        <Text style={{ color: colors.alert, padding: 8 }}>{error}</Text>
-      ) : null} */}
     </SafeAreaView>
   );
 }
@@ -227,7 +162,9 @@ const styles = StyleSheet.create({
   avatarRow: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 14,
+    padding: 20,
+    marginTop: 20,
+    gap: 12,
   },
   welcome: {
     fontSize: 16,
@@ -287,29 +224,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderTopWidth: 0.5,
     borderColor: "#eee",
-  },
-  speakingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.49)", // semi-transparent overlay
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 10,
-  },
-  barsContainer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    height: 50,
-    width: 120,
-    justifyContent: "space-between",
-  },
-  bar: {
-    width: 10,
-    height: 40,
-    backgroundColor: colors.primary,
-    borderRadius: 3,
   },
 });
