@@ -32,7 +32,7 @@ export default function VoiceChatbot() {
       time: getTimestamp(),
     },
   ]);
-  const [avatarText, setAvatarText] = useState(messages[0].text);
+  const [, setAvatarText] = useState(messages[0].text);
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
 

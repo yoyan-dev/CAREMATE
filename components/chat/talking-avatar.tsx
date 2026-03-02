@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 
 export default function TalkingAvatar({
@@ -12,16 +12,7 @@ export default function TalkingAvatar({
   const blinkAnim = useRef(new Animated.Value(1)).current;
   const headBob = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    startBlinking();
-    startBreathing();
-
-    if (isTalking) startTalking();
-    else stopTalking();
-  }, [isTalking]);
-
-  // Mouth animation
-  const startTalking = () => {
+  const startTalking = useCallback(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(mouthAnim, {
@@ -36,15 +27,14 @@ export default function TalkingAvatar({
         }),
       ])
     ).start();
-  };
+  }, [mouthAnim]);
 
-  const stopTalking = () => {
+  const stopTalking = useCallback(() => {
     mouthAnim.stopAnimation();
     mouthAnim.setValue(8);
-  };
+  }, [mouthAnim]);
 
-  // Blinking eyes
-  const startBlinking = () => {
+  const startBlinking = useCallback(() => {
     const blink = () => {
       Animated.sequence([
         Animated.timing(blinkAnim, {
@@ -61,10 +51,9 @@ export default function TalkingAvatar({
       ]).start(blink);
     };
     blink();
-  };
+  }, [blinkAnim]);
 
-  // Breathing / idle bob
-  const startBreathing = () => {
+  const startBreathing = useCallback(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(headBob, {
@@ -79,7 +68,21 @@ export default function TalkingAvatar({
         }),
       ])
     ).start();
-  };
+  }, [headBob]);
+
+  useEffect(() => {
+    startBlinking();
+    startBreathing();
+  }, [startBlinking, startBreathing]);
+
+  useEffect(() => {
+    if (isTalking) {
+      startTalking();
+      return;
+    }
+
+    stopTalking();
+  }, [isTalking, startTalking, stopTalking]);
 
   const headSize = size * 1;
 

@@ -1,4 +1,4 @@
-import { Message } from "@/types/index";
+import type { Message } from "@/types/index";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import * as Speech from "expo-speech";
@@ -59,29 +59,38 @@ export function useVoiceAssistant() {
         time: new Date().toISOString(),
       };
 
-      // Add user message
-      setMessages((prev) => [...prev, userMsg]);
+      const conversation = [...messages, userMsg];
+      setMessages(conversation);
 
       setIsThinking(true);
 
-      // AI response
-      const aiText = await askGemini([...messages, userMsg]);
-      const aiMsg: Message = {
-        id: Math.floor(Math.random() * 10000000000000).toString(),
-        role: "assistant",
-        text: aiText,
-        time: new Date().toISOString(),
-      };
+      try {
+        const aiText = await askGemini(conversation);
+        const aiMsg: Message = {
+          id: Math.floor(Math.random() * 10000000000000).toString(),
+          role: "assistant",
+          text: aiText,
+          time: new Date().toISOString(),
+        };
 
-      setMessages((prev) => [...prev, aiMsg]);
+        setMessages((prev) => [...prev, aiMsg]);
 
-      // TTS
-      Speech.speak(aiText, {
-        onStart: () => setIsTalking(true),
-        onDone: () => setIsTalking(false),
-      });
-
-      setIsThinking(false);
+        Speech.speak(aiText, {
+          onStart: () => setIsTalking(true),
+          onDone: () => setIsTalking(false),
+        });
+      } catch (e) {
+        console.error("Failed to generate assistant response:", e);
+        const fallbackMsg: Message = {
+          id: Math.floor(Math.random() * 10000000000000).toString(),
+          role: "assistant",
+          text: "I could not reach the AI service. Please check your API key and try again.",
+          time: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, fallbackMsg]);
+      } finally {
+        setIsThinking(false);
+      }
     },
     [messages],
   );

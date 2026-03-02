@@ -46,10 +46,10 @@ export default function ChatbotScreen() {
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>🏥</Text>
+            <Text style={styles.logoText}>AI</Text>
           </View>
           <View>
-            <Text style={styles.title}>AIDME</Text>
+            <Text style={styles.title}>CAREMATE</Text>
             <Text style={styles.subtitle}>
               First aid, home care & wellness guidance
             </Text>
@@ -61,8 +61,8 @@ export default function ChatbotScreen() {
       <View style={styles.avatarRow}>
         <TalkingAvatar isTalking={isTalking} size={110} />
         <View style={{ marginLeft: 12, justifyContent: "center" }}>
-          <Text style={styles.welcome}>Hi — I'm your assistant</Text>
-          <Text style={styles.small}>Say “What to do for a burn?”</Text>
+          <Text style={styles.welcome}>Hi - I am your assistant</Text>
+          <Text style={styles.small}>Say &quot;What to do for a burn?&quot;</Text>
         </View>
       </View>
 
@@ -108,15 +108,15 @@ export default function ChatbotScreen() {
             onPressIn={startListening}
             onPressOut={stopListening}
           >
-            <Text style={styles.micText}>🎤</Text>
+            <Text style={styles.micText}>Mic</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
 
       <View style={styles.disclaimer}>
         <Text style={{ fontSize: 12, color: "#333" }}>
-          ⚠️ This app provides general guidance only and is not a medical
-          professional. For severe symptoms, call emergency services
+          Warning: This app provides general guidance only and is not a
+          medical professional. For severe symptoms, call emergency services
           immediately.
         </Text>
       </View>
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   logoText: {
     color: colors.textLight,
     fontSize: 20,
+    fontWeight: "700",
   },
   title: {
     fontSize: 18,
@@ -217,7 +218,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   micText: {
-    fontSize: 18,
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.textDark,
   },
   disclaimer: {
     padding: 10,

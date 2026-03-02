@@ -15,7 +15,7 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.heroContainer}>
-        <Text style={styles.header}>Welcome to AIDME</Text>
+        <Text style={styles.header}>Welcome to CAREMATE</Text>
         <Text style={styles.subHeader}>
           Your AI-powered first aid assistant
         </Text>
@@ -27,8 +27,8 @@ export default function HomeScreen() {
           style={styles.heroImage}
         />
         <Text style={styles.introText}>
-          Hi there! I'm Aidme, your intelligent first aid buddy. How can I
-          assist you today?
+          Hi there! I&apos;m Caremate, your intelligent first aid buddy. How can
+          I assist you today?
         </Text>
       </View>
 

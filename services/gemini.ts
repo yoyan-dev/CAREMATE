@@ -1,18 +1,13 @@
 import axios from "axios";
-import { Message } from "../types";
+import type { Message } from "../types";
 
-const MODEL = process.env.EXPO_PUBLIC_GEMINI_MODEL || "gemini-2.5-flash-lite";
-const API_KEY =
-  process.env.GEMINI_API_KEY || "AIzaSyC4LIVRUSwvc5zq8T9IXDC6uw69yhuja14";
-
-if (!API_KEY) {
-  console.warn("Missing EXPO_PUBLIC_GEMINI_API_KEY");
-}
+const MODEL = process.env.EXPO_PUBLIC_GEMINI_MODEL ?? "gemini-2.5-flash-lite";
+const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
 /** Builds a single Gemini prompt from the chat history */
 function buildPrompt(messages: Message[]) {
   const systemPrompt = `
-    You are an AI Healthcare Assistant named AIDME you are create by the researchers from CPSU (Central Philippines State University - San Carlos Campus). Follow these rules:
+    You are an AI Healthcare Assistant named CAREMATE. Follow these rules:
     1) Never provide diagnoses.
     2) Never give medication dosages or prescriptions.
     3) For serious issues, tell the user to seek emergency care.
@@ -32,6 +27,12 @@ function buildPrompt(messages: Message[]) {
 }
 
 export async function askGemini(messages: Message[]) {
+  if (!API_KEY) {
+    throw new Error(
+      "Missing EXPO_PUBLIC_GEMINI_API_KEY. Add it to .env and restart Expo."
+    );
+  }
+
   const prompt = buildPrompt(messages);
 
   try {
