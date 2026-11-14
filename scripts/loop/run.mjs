@@ -203,6 +203,12 @@ async function main() {
   const config = loadConfig(root);
   const state = loadState(root);
   const tasks = loadBacklog(root);
+
+  if (options.task && !tasks.some((task) => task.id === options.task)) {
+    console.error(`Unknown task: ${options.task}`);
+    return 1;
+  }
+
   const startedAt = Date.now();
   const maxIterations = options.maxIterations ?? config.budget?.maxIterationsPerRun ?? 20;
   const maxMinutes = options.maxMinutes ?? config.budget?.maxMinutesPerRun ?? 480;
