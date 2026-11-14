@@ -306,10 +306,10 @@ async function main() {
     }
 
     if (options.dryRun) {
+      state.status = "idle";
       const prompt = buildPrompt(root, task, state, config);
       console.log(`\n=== Dry run: ${task.id} ${task.title} ===\n`);
       console.log(prompt);
-      state.status = "idle";
       return 0;
     }
 
