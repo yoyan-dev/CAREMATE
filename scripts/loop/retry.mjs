@@ -1,5 +1,13 @@
 #!/usr/bin/env node
-import { appendProgress, loadBacklog, loadState, nowIso, saveState, taskState } from "./lib.mjs";
+import {
+  appendProgress,
+  commitControllerState,
+  loadBacklog,
+  loadState,
+  nowIso,
+  saveState,
+  taskState,
+} from "./lib.mjs";
 
 function usage() {
   return `Retry a blocked or failed task
@@ -47,5 +55,6 @@ saveState(root, state);
 appendProgress(root, task, "retried", null, {
   note: `Retry requested: ${note || "no note"}`,
 });
+commitControllerState(root, `loop(${taskId}): retry`);
 
 console.log(`Reset ${taskId} to pending. Run \`npm run loop\` to retry.`);

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import {
   appendProgress,
+  commitControllerState,
   loadBacklog,
   loadState,
   nowIso,
@@ -61,6 +62,7 @@ saveState(root, state);
 appendProgress(root, task, "approved", null, {
   note: `Human approval: ${note || "no note"}`,
 });
+commitControllerState(root, `loop(${taskId}): human approval`);
 
 const next = selectNextTask(tasks, state, { includeOptional: false });
 console.log(`Approved ${taskId}.`);
