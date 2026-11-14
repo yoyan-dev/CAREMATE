@@ -17,6 +17,15 @@ permissions:
     resource: "*.env.example"
     effect: allow
   - action: edit
+    resource: "*.env"
+    effect: deny
+  - action: edit
+    resource: "*.env.*"
+    effect: deny
+  - action: edit
+    resource: "*.env.example"
+    effect: allow
+  - action: edit
     resource: "loop/**"
     effect: deny
   - action: edit

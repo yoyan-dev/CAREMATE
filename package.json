@@ -15,7 +15,8 @@
     "loop:once": "node scripts/loop/run.mjs --once",
     "loop:dry": "node scripts/loop/run.mjs --dry-run --once",
     "loop:status": "node scripts/loop/status.mjs",
-    "loop:approve": "node scripts/loop/approve.mjs"
+    "loop:approve": "node scripts/loop/approve.mjs",
+    "loop:retry": "node scripts/loop/retry.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

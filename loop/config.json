@@ -53,7 +53,10 @@
       "loop/**",
       "scripts/loop/**",
       ".opencode/**",
-      ".git/**"
+      ".git/**",
+      ".env",
+      ".env.local",
+      ".env.*.local"
     ],
     "protectedModifyOnly": [
       "jest.config.*",

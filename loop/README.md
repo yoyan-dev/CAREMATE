@@ -24,6 +24,12 @@ Verify a task manually:
 npm run verify -- P0-03
 ```
 
+Retry a blocked task:
+
+```bash
+npm run loop:retry -- P0-03 "Fixed the fixture manually"
+```
+
 ## Files
 
 | Path | Purpose |

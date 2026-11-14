@@ -259,6 +259,15 @@ npm run verify -- P0-03
 State is durable. Just run `npm run loop` again. If the tree is dirty, commit or
 stash first; the loop refuses to start on a dirty tree.
 
+### Retry a blocked task
+
+```bash
+npm run loop:retry -- P0-03 "Fixed the fixture manually"
+```
+
+This resets attempts and clears the last error. Use it only after understanding
+why the task blocked; otherwise the loop will hit the same wall.
+
 ---
 
 ## 7. Human gate policy
