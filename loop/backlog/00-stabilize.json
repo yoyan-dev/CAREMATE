@@ -1,0 +1,225 @@
+{
+  "phase": 0,
+  "name": "Stabilize the prototype",
+  "goal": "Make the current app run reliably and put a verification harness in place.",
+  "tasks": [
+    {
+      "id": "P0-01",
+      "title": "Add validated environment configuration and setup docs",
+      "priority": "P0",
+      "dependsOn": [],
+      "humanGate": false,
+      "estimatedMinutes": 45,
+      "scope": [
+        ".env.example",
+        "src/lib/env.ts",
+        "docs/SETUP.md",
+        "README.md"
+      ],
+      "acceptance": [
+        ".env.example documents EXPO_PUBLIC_API_BASE_URL and optional feature flags without real secrets",
+        "src/lib/env.ts validates required public env vars at startup and exports a typed env object",
+        "docs/SETUP.md explains install, env, run, and test commands",
+        "No real API key is committed"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": ".env.example" },
+        { "type": "fileContains", "path": ".env.example", "pattern": "EXPO_PUBLIC_API_BASE_URL" },
+        { "type": "fileExists", "path": "src/lib/env.ts" },
+        { "type": "fileExists", "path": "docs/SETUP.md" },
+        { "type": "fileContains", "path": "docs/SETUP.md", "pattern": "EXPO_PUBLIC_API_BASE_URL" }
+      ]
+    },
+    {
+      "id": "P0-02",
+      "title": "Add a deterministic test harness",
+      "priority": "P0",
+      "dependsOn": ["P0-01"],
+      "humanGate": false,
+      "estimatedMinutes": 60,
+      "scope": [
+        "package.json",
+        "jest.config.js",
+        "__tests__/smoke.test.ts"
+      ],
+      "acceptance": [
+        "Jest with jest-expo is configured and can run TypeScript tests",
+        "npm test runs the suite non-interactively",
+        "A smoke test proves the harness works",
+        "The test script is not weakened or replaced with a no-op"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "jest.config.js" },
+        { "type": "fileExists", "path": "__tests__/smoke.test.ts" },
+        { "type": "fileContains", "path": "package.json", "pattern": "\"test\"" },
+        { "type": "command", "name": "tests", "cmd": "npm test -- --runInBand", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P0-03",
+      "title": "Fix the voice loop end to end",
+      "priority": "P0",
+      "dependsOn": ["P0-02"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "hooks/use-voice-assistance.ts",
+        "src/features/voice/**",
+        "__tests__/voice.test.ts"
+      ],
+      "acceptance": [
+        "Starting and stopping the microphone always releases the recorder in a finally block",
+        "A final transcript is produced and sent to the chat, or the UI clearly falls back to text",
+        "Permission denied, no-speech, aborted, and network errors reset listening state",
+        "TTS cancellation resets isTalking",
+        "At least three unit tests cover start, stop, and error paths"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "__tests__/voice.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/voice.test.ts", "min": 3 },
+        { "type": "command", "name": "voice-tests", "cmd": "npm test -- --runInBand voice", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P0-04",
+      "title": "Remove dead code and stale configuration",
+      "priority": "P0",
+      "dependsOn": ["P0-02"],
+      "humanGate": false,
+      "estimatedMinutes": 30,
+      "scope": [
+        "components/chat/chat-app.tsx",
+        "app/_layout.tsx",
+        "package.json"
+      ],
+      "acceptance": [
+        "The unused localhost webhook component is deleted",
+        "The stale (tabs) anchor is removed or replaced with a real route",
+        "No unused starter-template components remain imported",
+        "Typecheck and lint still pass"
+      ],
+      "checks": [
+        { "type": "fileNotExists", "path": "components/chat/chat-app.tsx" },
+        { "type": "fileNotContains", "path": "app/_layout.tsx", "pattern": "\\(tabs\\)" }
+      ]
+    },
+    {
+      "id": "P0-05",
+      "title": "Harden the AI service: timeout, retry, and TTS lifecycle",
+      "priority": "P0",
+      "dependsOn": ["P0-01", "P0-02"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "services/gemini.ts",
+        "hooks/use-voice-assistance.ts",
+        "__tests__/gemini.test.ts"
+      ],
+      "acceptance": [
+        "AI requests have an explicit timeout and a clear typed error",
+        "Transient failures are retried with a bounded backoff",
+        "TTS onDone and onError both reset isTalking",
+        "Unit tests cover success, timeout, and failure",
+        "No real network call is made in tests"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "__tests__/gemini.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/gemini.test.ts", "min": 3 },
+        { "type": "command", "name": "gemini-tests", "cmd": "npm test -- --runInBand gemini", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P0-06",
+      "title": "Align the app identity with CAREMATE",
+      "priority": "P0",
+      "dependsOn": ["P0-01"],
+      "humanGate": false,
+      "estimatedMinutes": 30,
+      "scope": [
+        "app.json",
+        "package.json",
+        "assets/images/**",
+        "README.md"
+      ],
+      "acceptance": [
+        "Expo name is CAREMATE and slug is caremate",
+        "Package name is caremate",
+        "README no longer describes a generic create-expo-app starter",
+        "No AIDME branding remains in user-facing config"
+      ],
+      "checks": [
+        { "type": "fileContains", "path": "app.json", "pattern": "\"name\":\\s*\"CAREMATE\"" },
+        { "type": "fileContains", "path": "app.json", "pattern": "\"slug\":\\s*\"caremate\"" },
+        { "type": "fileContains", "path": "package.json", "pattern": "\"name\":\\s*\"caremate\"" },
+        { "type": "fileNotContains", "path": "README.md", "pattern": "Welcome to your Expo app" }
+      ]
+    },
+    {
+      "id": "P0-07",
+      "title": "Add CI for typecheck, lint, and tests",
+      "priority": "P0",
+      "dependsOn": ["P0-02"],
+      "humanGate": false,
+      "estimatedMinutes": 45,
+      "scope": [
+        ".github/workflows/ci.yml",
+        "package.json"
+      ],
+      "acceptance": [
+        "CI runs on push and pull request",
+        "CI installs with npm ci and runs typecheck, lint, and tests",
+        "CI has no continue-on-error",
+        "Workflow permissions are least-privilege"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": ".github/workflows/ci.yml" },
+        { "type": "fileContains", "path": ".github/workflows/ci.yml", "pattern": "npm ci" },
+        { "type": "fileContains", "path": ".github/workflows/ci.yml", "pattern": "typecheck" },
+        { "type": "fileContains", "path": ".github/workflows/ci.yml", "pattern": "test" },
+        { "type": "fileNotContains", "path": ".github/workflows/ci.yml", "pattern": "continue-on-error" }
+      ]
+    },
+    {
+      "id": "P0-08",
+      "title": "Fix accessibility and contrast quick wins",
+      "priority": "P0",
+      "dependsOn": ["P0-02"],
+      "humanGate": false,
+      "estimatedMinutes": 45,
+      "scope": [
+        "components/featured.tsx",
+        "app/screens/chatbot-screen.tsx",
+        "app/screens/home-screen.tsx",
+        "components/chat/chat-bubble.tsx"
+      ],
+      "acceptance": [
+        "Body text meets 4.5:1 contrast on its background",
+        "Icon-only controls have accessibility labels",
+        "Touch targets are at least 44x44",
+        "New chat messages are announced to screen readers"
+      ],
+      "checks": [
+        { "type": "fileNotContains", "path": "components/featured.tsx", "pattern": "colors\\.textLight" },
+        { "type": "fileContains", "path": "app/screens/chatbot-screen.tsx", "pattern": "accessibilityLabel" },
+        { "type": "fileContains", "path": "components/chat/chat-bubble.tsx", "pattern": "accessibility" }
+      ]
+    },
+    {
+      "id": "P0-09",
+      "title": "Phase 0 review",
+      "priority": "P0",
+      "dependsOn": ["P0-01", "P0-02", "P0-03", "P0-04", "P0-05", "P0-06", "P0-07", "P0-08"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 20,
+      "scope": ["loop/PROGRESS.md", "docs/SETUP.md"],
+      "acceptance": [
+        "A human has run the app and confirmed the mic and chat work on a device or simulator",
+        "A human has reviewed the Phase 0 diff and test quality",
+        "The Gemini key has been rotated and removed from the client",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}

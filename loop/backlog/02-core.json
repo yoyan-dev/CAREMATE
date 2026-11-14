@@ -1,0 +1,306 @@
+{
+  "phase": 2,
+  "name": "Core product features",
+  "goal": "Deliver a complete v1 chat experience with onboarding, voice, history, guides, and settings.",
+  "tasks": [
+    {
+      "id": "P2-01",
+      "title": "Build onboarding and consent flow",
+      "priority": "P0",
+      "dependsOn": ["P1-11"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "app/(onboarding)/welcome.tsx",
+        "app/(onboarding)/safety.tsx",
+        "app/(onboarding)/consent.tsx",
+        "app/(onboarding)/_layout.tsx",
+        "src/features/onboarding/use-onboarding.ts",
+        "__tests__/onboarding.test.tsx"
+      ],
+      "acceptance": [
+        "New users see welcome, safety, and consent screens once",
+        "Consent is explicit and can be revisited in Settings",
+        "The emergency notice is visible before entering the app",
+        "At least four tests cover the flow and persistence"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "app/(onboarding)/welcome.tsx" },
+        { "type": "fileExists", "path": "app/(onboarding)/safety.tsx" },
+        { "type": "fileExists", "path": "app/(onboarding)/consent.tsx" },
+        { "type": "fileExists", "path": "src/features/onboarding/use-onboarding.ts" },
+        { "type": "fileExists", "path": "__tests__/onboarding.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/onboarding.test.tsx", "min": 4 },
+        { "type": "command", "name": "onboarding-tests", "cmd": "npm test -- --runInBand onboarding", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-02",
+      "title": "Add tab navigation for Home, Guides, Chat, and Settings",
+      "priority": "P0",
+      "dependsOn": ["P2-01"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "app/(tabs)/_layout.tsx",
+        "app/(tabs)/home.tsx",
+        "app/(tabs)/guides.tsx",
+        "app/(tabs)/chat.tsx",
+        "app/(tabs)/settings.tsx",
+        "app/index.tsx"
+      ],
+      "acceptance": [
+        "The app has four tabs with icons and accessible labels",
+        "The root route redirects to onboarding or home",
+        "The old screen routes redirect or are removed",
+        "Deep links still resolve"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "app/(tabs)/_layout.tsx" },
+        { "type": "fileExists", "path": "app/(tabs)/home.tsx" },
+        { "type": "fileExists", "path": "app/(tabs)/guides.tsx" },
+        { "type": "fileExists", "path": "app/(tabs)/chat.tsx" },
+        { "type": "fileExists", "path": "app/(tabs)/settings.tsx" },
+        { "type": "fileContains", "path": "app/(tabs)/_layout.tsx", "pattern": "accessibilityLabel" }
+      ]
+    },
+    {
+      "id": "P2-03",
+      "title": "Implement streaming chat responses",
+      "priority": "P0",
+      "dependsOn": ["P1-05", "P2-02"],
+      "humanGate": false,
+      "estimatedMinutes": 150,
+      "scope": [
+        "src/features/chat/use-chat-stream.ts",
+        "src/features/chat/components/message-list.tsx",
+        "src/features/chat/components/composer.tsx",
+        "__tests__/stream.test.ts"
+      ],
+      "acceptance": [
+        "Responses render token by token from an async iterable",
+        "Stop cancels the stream and marks the message",
+        "Retry resends the last user message",
+        "Errors render an actionable message",
+        "At least five tests cover stream, stop, retry, and error"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/chat/use-chat-stream.ts" },
+        { "type": "fileExists", "path": "src/features/chat/components/composer.tsx" },
+        { "type": "fileExists", "path": "__tests__/stream.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/stream.test.ts", "min": 5 },
+        { "type": "command", "name": "stream-tests", "cmd": "npm test -- --runInBand stream", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-04",
+      "title": "Build the voice conversation UI",
+      "priority": "P0",
+      "dependsOn": ["P0-03", "P2-03"],
+      "humanGate": false,
+      "estimatedMinutes": 150,
+      "scope": [
+        "src/features/voice/use-speech-to-text.ts",
+        "src/features/voice/use-text-to-speech.ts",
+        "src/features/voice/voice-button.tsx",
+        "__tests__/voice-ui.test.tsx"
+      ],
+      "acceptance": [
+        "Push-to-talk shows partial and final transcripts",
+        "TTS has a stop control and cancels on barge-in",
+        "Permission and no-speech errors are visible and recoverable",
+        "At least five tests cover idle, listening, speaking, and error states"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/voice/use-speech-to-text.ts" },
+        { "type": "fileExists", "path": "src/features/voice/use-text-to-speech.ts" },
+        { "type": "fileExists", "path": "src/features/voice/voice-button.tsx" },
+        { "type": "fileExists", "path": "__tests__/voice-ui.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/voice-ui.test.tsx", "min": 5 },
+        { "type": "command", "name": "voice-ui-tests", "cmd": "npm test -- --runInBand voice-ui", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-05",
+      "title": "Build conversation history",
+      "priority": "P0",
+      "dependsOn": ["P1-03", "P2-03"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "app/chat/[id].tsx",
+        "src/features/chat/components/conversation-list.tsx",
+        "src/features/chat/use-conversations.ts",
+        "__tests__/history.test.tsx"
+      ],
+      "acceptance": [
+        "History lists conversations by recency with title and preview",
+        "Rename, delete, and search work and persist",
+        "Deleting requires confirmation",
+        "At least five tests cover list, search, rename, and delete"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "app/chat/[id].tsx" },
+        { "type": "fileExists", "path": "src/features/chat/components/conversation-list.tsx" },
+        { "type": "fileExists", "path": "__tests__/history.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/history.test.tsx", "min": 5 },
+        { "type": "command", "name": "history-tests", "cmd": "npm test -- --runInBand history", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-06",
+      "title": "Create the first-aid guide schema and seed content",
+      "priority": "P0",
+      "dependsOn": ["P1-03"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "src/features/guides/types.ts",
+        "src/data/seed/guides/burns.json",
+        "src/data/seed/guides/cpr.json",
+        "src/data/seed/guides/choking.json",
+        "src/data/repositories/guide.repository.ts",
+        "__tests__/guides-content.test.ts"
+      ],
+      "acceptance": [
+        "Guides include steps, dos, don'ts, call-emergency-if, sources, version, and reviewedAt",
+        "At least three guides are seeded and valid JSON",
+        "The repository loads and searches guides offline",
+        "Content tests validate schema and required fields"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/guides/types.ts" },
+        { "type": "fileExists", "path": "src/data/seed/guides/burns.json" },
+        { "type": "fileExists", "path": "src/data/seed/guides/cpr.json" },
+        { "type": "fileExists", "path": "src/data/seed/guides/choking.json" },
+        { "type": "jsonValid", "path": "src/data/seed/guides/burns.json" },
+        { "type": "jsonValid", "path": "src/data/seed/guides/cpr.json" },
+        { "type": "jsonValid", "path": "src/data/seed/guides/choking.json" },
+        { "type": "fileExists", "path": "__tests__/guides-content.test.ts" },
+        { "type": "command", "name": "guides-content-tests", "cmd": "npm test -- --runInBand guides-content", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-07",
+      "title": "Build guide browsing, search, and detail",
+      "priority": "P0",
+      "dependsOn": ["P2-02", "P2-06"],
+      "humanGate": false,
+      "estimatedMinutes": 150,
+      "scope": [
+        "app/(tabs)/guides.tsx",
+        "app/guides/[slug].tsx",
+        "src/features/guides/use-guides.ts",
+        "src/features/guides/components/guide-card.tsx",
+        "__tests__/guides.test.tsx"
+      ],
+      "acceptance": [
+        "Guides are browsable by category and searchable offline",
+        "Detail pages show steps, dos, don'ts, and emergency triggers",
+        "Empty and no-results states are handled",
+        "At least five tests cover search, category, detail, and empty state"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "app/(tabs)/guides.tsx" },
+        { "type": "fileExists", "path": "app/guides/[slug].tsx" },
+        { "type": "fileExists", "path": "src/features/guides/use-guides.ts" },
+        { "type": "fileExists", "path": "__tests__/guides.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/guides.test.tsx", "min": 5 },
+        { "type": "command", "name": "guides-tests", "cmd": "npm test -- --runInBand guides", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-08",
+      "title": "Build Settings with theme, voice, and data controls",
+      "priority": "P0",
+      "dependsOn": ["P2-02"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "app/(tabs)/settings.tsx",
+        "src/features/settings/settings.store.ts",
+        "src/features/settings/components/settings-screen.tsx",
+        "__tests__/settings.test.tsx"
+      ],
+      "acceptance": [
+        "Theme, voice output, and reduced motion persist",
+        "Export my data and Delete my data are available and confirmed",
+        "Legal links are reachable",
+        "At least five tests cover persistence and destructive confirmation"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "app/(tabs)/settings.tsx" },
+        { "type": "fileExists", "path": "src/features/settings/settings.store.ts" },
+        { "type": "fileExists", "path": "__tests__/settings.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/settings.test.tsx", "min": 5 },
+        { "type": "command", "name": "settings-tests", "cmd": "npm test -- --runInBand settings", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-09",
+      "title": "Add offline detection, queueing, and banner",
+      "priority": "P1",
+      "dependsOn": ["P2-03"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "src/features/chat/use-offline-queue.ts",
+        "src/components/ui/offline-banner.tsx",
+        "__tests__/offline.test.tsx"
+      ],
+      "acceptance": [
+        "Offline state is detected and shown",
+        "Queued messages send when connectivity returns",
+        "Failed sends can be retried or deleted",
+        "At least four tests cover offline, queue, flush, and failure"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/chat/use-offline-queue.ts" },
+        { "type": "fileExists", "path": "src/components/ui/offline-banner.tsx" },
+        { "type": "fileExists", "path": "__tests__/offline.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/offline.test.tsx", "min": 4 },
+        { "type": "command", "name": "offline-tests", "cmd": "npm test -- --runInBand offline", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P2-10",
+      "title": "Optimize chat and guide lists",
+      "priority": "P1",
+      "dependsOn": ["P2-03", "P2-07"],
+      "humanGate": false,
+      "estimatedMinutes": 60,
+      "scope": [
+        "package.json",
+        "src/features/chat/components/message-list.tsx",
+        "src/features/guides/components/guide-list.tsx"
+      ],
+      "acceptance": [
+        "Chat and guide lists use a virtualized list",
+        "Keys are stable and items are memoized",
+        "No obvious layout thrash on long lists",
+        "Typecheck and lint pass"
+      ],
+      "checks": [
+        { "type": "fileContains", "path": "package.json", "pattern": "flash-list" },
+        { "type": "fileContains", "path": "src/features/chat/components/message-list.tsx", "pattern": "FlashList" }
+      ]
+    },
+    {
+      "id": "P2-11",
+      "title": "Phase 2 review",
+      "priority": "P0",
+      "dependsOn": ["P2-01", "P2-02", "P2-03", "P2-04", "P2-05", "P2-06", "P2-07", "P2-08", "P2-09", "P2-10"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 45,
+      "scope": ["loop/PROGRESS.md", "app/**", "src/features/**"],
+      "acceptance": [
+        "A human has completed onboarding, sent a text message, used voice, and read a guide offline",
+        "Chat history survives an app restart",
+        "The phase demo is recorded in loop/PROGRESS.md",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}

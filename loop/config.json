@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "project": "CAREMATE",
+  "agent": {
+    "command": "opencode",
+    "args": ["run", "--agent", "caremate-dev", "--format", "json"],
+    "timeoutMs": 1800000
+  },
+  "budget": {
+    "maxIterationsPerRun": 20,
+    "maxMinutesPerRun": 480,
+    "maxAttemptsPerTask": 3,
+    "maxConsecutiveFailures": 2,
+    "maxNoProgressRepeats": 2
+  },
+  "git": {
+    "branch": "loop/dev",
+    "autoCreateBranch": true,
+    "commit": true,
+    "commitPrefix": "loop",
+    "push": false,
+    "resetOnFailure": true
+  },
+  "verify": {
+    "requireChanges": true,
+    "globalChecks": [
+      {
+        "type": "command",
+        "name": "typecheck",
+        "cmd": "node node_modules/typescript/lib/tsc.js --noEmit",
+        "timeoutMs": 180000
+      },
+      {
+        "type": "command",
+        "name": "lint",
+        "cmd": "node node_modules/eslint/bin/eslint.js .",
+        "timeoutMs": 180000
+      },
+      {
+        "type": "command",
+        "name": "whitespace",
+        "cmd": "git diff --check",
+        "timeoutMs": 30000
+      }
+    ],
+    "controllerOwnedPaths": [
+      "loop/state.json",
+      "loop/PROGRESS.md",
+      "loop/ESCALATIONS.md",
+      "loop/runs/**"
+    ],
+    "protectedPaths": [
+      "loop/**",
+      "scripts/loop/**",
+      ".opencode/**",
+      ".git/**"
+    ],
+    "protectedModifyOnly": [
+      "jest.config.*",
+      ".github/**"
+    ],
+    "testFilePatterns": [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "**/__tests__/**"
+    ],
+    "forbiddenAddedPatterns": [
+      "\\.skip\\s*\\(",
+      "\\bxit\\s*\\(",
+      "\\bxdescribe\\s*\\(",
+      "\\bdescribe\\.skip\\b",
+      "\\bit\\.skip\\b",
+      "\\btest\\.skip\\b",
+      "\\bcontinue-on-error\\b",
+      "--no-verify",
+      "\\bprocess\\.exit\\(0\\)",
+      "\\bcoverageThreshold\\b",
+      "@ts-ignore",
+      "@ts-expect-error",
+      "eslint-disable"
+    ],
+    "scriptIntegrity": {
+      "typecheck": "tsc",
+      "test": "jest",
+      "verify": "scripts/loop/verify.mjs",
+      "loop": "scripts/loop/run.mjs"
+    }
+  }
+}

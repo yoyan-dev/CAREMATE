@@ -1,0 +1,111 @@
+{
+  "phase": 6,
+  "name": "Post-launch (optional)",
+  "goal": "Extend the product after launch without blocking v1.",
+  "optional": true,
+  "tasks": [
+    {
+      "id": "P6-01",
+      "title": "Add accounts and encrypted cloud sync",
+      "priority": "P2",
+      "dependsOn": ["P5-09"],
+      "humanGate": true,
+      "blocking": false,
+      "optional": true,
+      "estimatedMinutes": 30,
+      "scope": ["docs/ADR/0005-auth-sync.md"],
+      "acceptance": [
+        "A human chooses the auth provider and sync model",
+        "Conflict resolution and encryption are documented",
+        "The default remains local-first",
+        "The decision is recorded in an ADR"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P6-02",
+      "title": "Add internationalization",
+      "priority": "P2",
+      "dependsOn": ["P5-09"],
+      "humanGate": false,
+      "optional": true,
+      "estimatedMinutes": 180,
+      "scope": [
+        "src/lib/i18n.ts",
+        "src/locales/en.json",
+        "src/locales/es.json",
+        "__tests__/i18n.test.ts"
+      ],
+      "acceptance": [
+        "UI strings are externalized",
+        "English and Spanish locale files exist",
+        "Layout is RTL-ready",
+        "At least three tests cover locale switching and fallback"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/lib/i18n.ts" },
+        { "type": "fileExists", "path": "src/locales/en.json" },
+        { "type": "fileExists", "path": "src/locales/es.json" },
+        { "type": "command", "name": "i18n-tests", "cmd": "npm test -- --runInBand i18n", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P6-03",
+      "title": "Add home-screen widgets and quick actions",
+      "priority": "P2",
+      "dependsOn": ["P5-09"],
+      "humanGate": false,
+      "optional": true,
+      "estimatedMinutes": 180,
+      "scope": [
+        "src/features/widgets/**",
+        "docs/WIDGETS.md"
+      ],
+      "acceptance": [
+        "Emergency and Chat quick actions are available",
+        "Widgets work on supported platforms and degrade gracefully",
+        "Setup is documented",
+        "Typecheck and lint pass"
+      ],
+      "checks": [
+        { "type": "dirExists", "path": "src/features/widgets" },
+        { "type": "fileExists", "path": "docs/WIDGETS.md" }
+      ]
+    },
+    {
+      "id": "P6-04",
+      "title": "Expand the reviewed first-aid content library",
+      "priority": "P2",
+      "dependsOn": ["P5-09"],
+      "humanGate": true,
+      "blocking": false,
+      "optional": true,
+      "estimatedMinutes": 240,
+      "scope": ["src/data/seed/guides/**", "docs/CONTENT_REVIEW.md"],
+      "acceptance": [
+        "At least ten additional guides are added",
+        "Every guide has sources and a reviewedAt date",
+        "A qualified reviewer signs off",
+        "Content tests pass"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P6-05",
+      "title": "Post-launch review",
+      "priority": "P2",
+      "dependsOn": ["P6-01", "P6-02", "P6-03", "P6-04"],
+      "humanGate": true,
+      "blocking": true,
+      "optional": true,
+      "estimatedMinutes": 30,
+      "scope": ["loop/PROGRESS.md"],
+      "acceptance": [
+        "A human has reviewed post-launch metrics and feedback",
+        "The next quarter's priorities are recorded",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}

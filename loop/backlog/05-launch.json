@@ -1,0 +1,194 @@
+{
+  "phase": 5,
+  "name": "Launch readiness",
+  "goal": "Harden, instrument, and package the app for store submission.",
+  "tasks": [
+    {
+      "id": "P5-01",
+      "title": "Add end-to-end Maestro flows",
+      "priority": "P0",
+      "dependsOn": ["P4-06"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        ".maestro/onboarding.yaml",
+        ".maestro/chat.yaml",
+        ".maestro/emergency.yaml",
+        "docs/E2E.md"
+      ],
+      "acceptance": [
+        "E2E covers onboarding, text chat, guide reading, and emergency",
+        "Flows use stable accessibility IDs, not brittle text selectors",
+        "Docs explain how to run them locally and in CI",
+        "The flows are committed and parse as valid YAML"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": ".maestro/onboarding.yaml" },
+        { "type": "fileExists", "path": ".maestro/chat.yaml" },
+        { "type": "fileExists", "path": ".maestro/emergency.yaml" },
+        { "type": "fileExists", "path": "docs/E2E.md" }
+      ]
+    },
+    {
+      "id": "P5-02",
+      "title": "Run and document an accessibility audit",
+      "priority": "P0",
+      "dependsOn": ["P4-06"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "docs/ACCESSIBILITY_AUDIT.md",
+        "__tests__/a11y.test.tsx"
+      ],
+      "acceptance": [
+        "Every screen has labels, roles, and focus order checked",
+        "Dynamic type and reduced motion are verified",
+        "Contrast is checked for all text",
+        "Findings and fixes are documented"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "docs/ACCESSIBILITY_AUDIT.md" },
+        { "type": "fileExists", "path": "__tests__/a11y.test.tsx" },
+        { "type": "command", "name": "a11y-tests", "cmd": "npm test -- --runInBand a11y", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P5-03",
+      "title": "Run a performance and bundle audit",
+      "priority": "P1",
+      "dependsOn": ["P4-06"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "docs/PERFORMANCE.md",
+        "src/features/chat/components/message-list.tsx"
+      ],
+      "acceptance": [
+        "Bundle size and startup time are measured",
+        "3D/Lottie assets are lazy-loaded or removed if unused",
+        "Long-list performance is verified",
+        "Regressions and follow-ups are documented"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "docs/PERFORMANCE.md" },
+        { "type": "fileContains", "path": "docs/PERFORMANCE.md", "pattern": "bundle|startup" }
+      ]
+    },
+    {
+      "id": "P5-04",
+      "title": "Add Sentry and production logging",
+      "priority": "P1",
+      "dependsOn": ["P1-06"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "src/lib/sentry.ts",
+        "app/_layout.tsx",
+        "package.json"
+      ],
+      "acceptance": [
+        "Sentry initializes only when a DSN is configured",
+        "Message bodies and health data are never sent",
+        "Non-fatal errors are reported with context",
+        "The app still runs without a DSN"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/lib/sentry.ts" },
+        { "type": "fileContains", "path": "package.json", "pattern": "sentry" },
+        { "type": "fileContains", "path": "src/lib/sentry.ts", "pattern": "beforeSend|redact" }
+      ]
+    },
+    {
+      "id": "P5-05",
+      "title": "Prepare store metadata and assets",
+      "priority": "P0",
+      "dependsOn": ["P5-02"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "docs/store/metadata.md",
+        "docs/store/screenshots.md",
+        "assets/store/**"
+      ],
+      "acceptance": [
+        "App name, subtitle, description, keywords, and category are drafted",
+        "Privacy labels and data-safety answers are drafted",
+        "Required icon and screenshot sizes are listed",
+        "No unsupported medical claims appear in copy"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "docs/store/metadata.md" },
+        { "type": "fileExists", "path": "docs/store/screenshots.md" },
+        { "type": "fileNotContains", "path": "docs/store/metadata.md", "pattern": "diagnose|prescribe|guaranteed" }
+      ]
+    },
+    {
+      "id": "P5-06",
+      "title": "Final legal and privacy review",
+      "priority": "P0",
+      "dependsOn": ["P3-04", "P5-05"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 60,
+      "scope": ["docs/legal/**", "docs/store/metadata.md"],
+      "acceptance": [
+        "A human has reviewed disclaimer, privacy policy, terms, and store copy",
+        "Emergency and limitation-of-liability language is approved",
+        "The review is recorded in docs/legal/REVIEW.md",
+        "No claims imply diagnosis or treatment"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P5-07",
+      "title": "Create a production EAS build",
+      "priority": "P0",
+      "dependsOn": ["P5-06"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 60,
+      "scope": ["eas.json", "docs/store/build.md"],
+      "acceptance": [
+        "Production build profile is reviewed",
+        "The build runs on a clean checkout",
+        "Version and build numbers are set",
+        "The build artifact is linked in docs/store/build.md"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P5-08",
+      "title": "Submit to app stores",
+      "priority": "P0",
+      "dependsOn": ["P5-07"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 60,
+      "scope": ["docs/store/submission.md"],
+      "acceptance": [
+        "A human submits the production build",
+        "Store review notes and demo credentials are provided",
+        "Submission status is recorded",
+        "Rollback plan is documented"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P5-09",
+      "title": "Phase 5 launch review",
+      "priority": "P0",
+      "dependsOn": ["P5-01", "P5-02", "P5-03", "P5-04", "P5-05", "P5-06", "P5-07", "P5-08"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 45,
+      "scope": ["loop/PROGRESS.md", "docs/store/**"],
+      "acceptance": [
+        "A human has run the full E2E suite",
+        "Crash-free and latency targets are met or accepted",
+        "Store submission is approved",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}

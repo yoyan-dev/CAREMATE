@@ -1,0 +1,300 @@
+{
+  "phase": 1,
+  "name": "Architecture refactor",
+  "goal": "Create a feature-first skeleton with typed boundaries, durable storage, and shared UI.",
+  "tasks": [
+    {
+      "id": "P1-01",
+      "title": "Introduce the src/ feature-first structure and import boundaries",
+      "priority": "P0",
+      "dependsOn": ["P0-09"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "src/features/**",
+        "src/components/ui/**",
+        "src/data/**",
+        "src/services/**",
+        "src/lib/**",
+        "src/theme/**",
+        "src/types/**",
+        "eslint.config.js",
+        "docs/ADR/0001-architecture.md"
+      ],
+      "acceptance": [
+        "The target src/ directories exist with index files or placeholders",
+        "ESLint enforces the layering rules from the brief",
+        "An ADR records the architecture decision",
+        "The existing app still typechecks"
+      ],
+      "checks": [
+        { "type": "dirExists", "path": "src/features" },
+        { "type": "dirExists", "path": "src/components/ui" },
+        { "type": "dirExists", "path": "src/data" },
+        { "type": "dirExists", "path": "src/services" },
+        { "type": "dirExists", "path": "src/lib" },
+        { "type": "dirExists", "path": "src/theme" },
+        { "type": "dirExists", "path": "src/types" },
+        { "type": "fileExists", "path": "docs/ADR/0001-architecture.md" },
+        { "type": "fileContains", "path": "eslint.config.js", "pattern": "boundaries|no-restricted" }
+      ]
+    },
+    {
+      "id": "P1-02",
+      "title": "Add theme tokens and shared UI primitives",
+      "priority": "P0",
+      "dependsOn": ["P1-01"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "src/theme/**",
+        "src/components/ui/button.tsx",
+        "src/components/ui/card.tsx",
+        "src/components/ui/input.tsx",
+        "src/components/ui/screen.tsx",
+        "src/components/ui/empty-state.tsx",
+        "__tests__/ui.test.tsx"
+      ],
+      "acceptance": [
+        "Colors, spacing, radii, and typography live in one theme module",
+        "Button, Card, Input, Screen, and EmptyState are reusable and typed",
+        "Primitives expose accessibility props and support dark mode",
+        "At least four component tests cover rendering and interaction"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/theme/index.ts" },
+        { "type": "fileExists", "path": "src/components/ui/button.tsx" },
+        { "type": "fileExists", "path": "src/components/ui/card.tsx" },
+        { "type": "fileExists", "path": "src/components/ui/input.tsx" },
+        { "type": "fileExists", "path": "src/components/ui/screen.tsx" },
+        { "type": "fileExists", "path": "__tests__/ui.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/ui.test.tsx", "min": 4 },
+        { "type": "command", "name": "ui-tests", "cmd": "npm test -- --runInBand ui", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P1-03",
+      "title": "Add SQLite schema, migrations, and repositories",
+      "priority": "P0",
+      "dependsOn": ["P1-01"],
+      "humanGate": false,
+      "estimatedMinutes": 180,
+      "scope": [
+        "src/data/db/client.ts",
+        "src/data/db/schema.ts",
+        "src/data/db/migrations/001_init.sql",
+        "src/data/repositories/conversation.repository.ts",
+        "src/data/repositories/message.repository.ts",
+        "__tests__/repository.test.ts"
+      ],
+      "acceptance": [
+        "Conversations and messages have typed tables with indexes",
+        "Migrations are versioned and idempotent",
+        "Repositories expose create, list, update, and delete operations",
+        "Tests use an in-memory or temporary database, not production data",
+        "At least five repository tests pass"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/data/db/client.ts" },
+        { "type": "fileExists", "path": "src/data/db/schema.ts" },
+        { "type": "fileExists", "path": "src/data/db/migrations/001_init.sql" },
+        { "type": "fileExists", "path": "src/data/repositories/conversation.repository.ts" },
+        { "type": "fileExists", "path": "src/data/repositories/message.repository.ts" },
+        { "type": "fileExists", "path": "__tests__/repository.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/repository.test.ts", "min": 5 },
+        { "type": "command", "name": "repository-tests", "cmd": "npm test -- --runInBand repository", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P1-04",
+      "title": "Add client state management for chat",
+      "priority": "P0",
+      "dependsOn": ["P1-01"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "src/features/chat/chat.store.ts",
+        "src/features/chat/chat.types.ts",
+        "__tests__/chat.store.test.ts"
+      ],
+      "acceptance": [
+        "Chat state is separated from UI components",
+        "Actions cover add message, update status, clear conversation, and select conversation",
+        "The store is testable without React",
+        "At least four store tests pass"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/chat/chat.store.ts" },
+        { "type": "fileExists", "path": "src/features/chat/chat.types.ts" },
+        { "type": "fileExists", "path": "__tests__/chat.store.test.ts" },
+        { "type": "fileContains", "path": "package.json", "pattern": "zustand" },
+        { "type": "minTestCount", "path": "__tests__/chat.store.test.ts", "min": 4 },
+        { "type": "command", "name": "chat-store-tests", "cmd": "npm test -- --runInBand chat.store", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P1-05",
+      "title": "Create a typed AI client interface with a fake",
+      "priority": "P0",
+      "dependsOn": ["P1-01"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "src/services/ai/ai-client.ts",
+        "src/services/ai/ai-http-client.ts",
+        "src/services/ai/ai-fake.ts",
+        "__tests__/ai-client.test.ts"
+      ],
+      "acceptance": [
+        "The AI boundary is an interface with streaming and non-streaming methods",
+        "The HTTP implementation has timeout and error mapping",
+        "The fake implementation is deterministic for tests",
+        "At least three tests cover success, failure, and cancellation"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/services/ai/ai-client.ts" },
+        { "type": "fileExists", "path": "src/services/ai/ai-http-client.ts" },
+        { "type": "fileExists", "path": "src/services/ai/ai-fake.ts" },
+        { "type": "fileExists", "path": "__tests__/ai-client.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/ai-client.test.ts", "min": 3 },
+        { "type": "command", "name": "ai-client-tests", "cmd": "npm test -- --runInBand ai-client", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P1-06",
+      "title": "Add error boundary, logger, and result helpers",
+      "priority": "P0",
+      "dependsOn": ["P1-01"],
+      "humanGate": false,
+      "estimatedMinutes": 75,
+      "scope": [
+        "src/lib/logger.ts",
+        "src/lib/result.ts",
+        "src/components/ui/error-boundary.tsx",
+        "__tests__/lib.test.ts"
+      ],
+      "acceptance": [
+        "Logger supports levels and redacts message bodies",
+        "Result helpers model ok/error without throwing",
+        "Error boundary renders a safe fallback and reports once",
+        "At least three tests pass"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/lib/logger.ts" },
+        { "type": "fileExists", "path": "src/lib/result.ts" },
+        { "type": "fileExists", "path": "src/components/ui/error-boundary.tsx" },
+        { "type": "fileExists", "path": "__tests__/lib.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/lib.test.ts", "min": 3 },
+        { "type": "command", "name": "lib-tests", "cmd": "npm test -- --runInBand lib", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P1-07",
+      "title": "Migrate home and chat screens to feature modules",
+      "priority": "P0",
+      "dependsOn": ["P1-02", "P1-04"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "app/screens/home-screen.tsx",
+        "app/screens/chatbot-screen.tsx",
+        "src/features/chat/components/chat-screen.tsx",
+        "src/features/home/components/home-screen.tsx"
+      ],
+      "acceptance": [
+        "Route files are thin wrappers that import feature screens",
+        "Business logic is not in app/",
+        "The existing routes still work",
+        "Typecheck passes"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/chat/components/chat-screen.tsx" },
+        { "type": "fileExists", "path": "src/features/home/components/home-screen.tsx" },
+        { "type": "fileContains", "path": "app/screens/chatbot-screen.tsx", "pattern": "features/chat" },
+        { "type": "fileContains", "path": "app/screens/home-screen.tsx", "pattern": "features/home" }
+      ]
+    },
+    {
+      "id": "P1-08",
+      "title": "Write architecture decision records",
+      "priority": "P1",
+      "dependsOn": ["P1-01"],
+      "humanGate": false,
+      "estimatedMinutes": 45,
+      "scope": [
+        "docs/ADR/0002-state.md",
+        "docs/ADR/0003-storage.md",
+        "docs/ADR/0004-ai-proxy.md"
+      ],
+      "acceptance": [
+        "ADRs record context, decision, alternatives, and consequences",
+        "State, storage, and AI proxy decisions are documented",
+        "Open questions are listed explicitly"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "docs/ADR/0002-state.md" },
+        { "type": "fileExists", "path": "docs/ADR/0003-storage.md" },
+        { "type": "fileExists", "path": "docs/ADR/0004-ai-proxy.md" }
+      ]
+    },
+    {
+      "id": "P1-09",
+      "title": "Define the AI proxy contract and safety boundary",
+      "priority": "P0",
+      "dependsOn": ["P1-05", "P1-08"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "docs/API.md",
+        "src/services/ai/contracts.ts",
+        "__tests__/ai-contract.test.ts"
+      ],
+      "acceptance": [
+        "The client/server contract covers chat, streaming, safety, and errors",
+        "The contract uses stable error codes",
+        "The safety escalation event is typed",
+        "Contract tests validate request and response schemas"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "docs/API.md" },
+        { "type": "fileExists", "path": "src/services/ai/contracts.ts" },
+        { "type": "fileExists", "path": "__tests__/ai-contract.test.ts" },
+        { "type": "command", "name": "contract-tests", "cmd": "npm test -- --runInBand ai-contract", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P1-10",
+      "title": "Approve backend and auth decisions",
+      "priority": "P0",
+      "dependsOn": ["P1-09"],
+      "humanGate": true,
+      "blocking": false,
+      "estimatedMinutes": 30,
+      "scope": ["docs/ADR/0004-ai-proxy.md"],
+      "acceptance": [
+        "A human chooses the backend host and auth model",
+        "Secrets are configured outside the client",
+        "The choice is recorded in the ADR",
+        "Deployment remains gated"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P1-11",
+      "title": "Phase 1 review",
+      "priority": "P0",
+      "dependsOn": ["P1-01", "P1-02", "P1-03", "P1-04", "P1-05", "P1-06", "P1-07", "P1-08", "P1-09", "P1-10"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 30,
+      "scope": ["loop/PROGRESS.md", "docs/ADR/**"],
+      "acceptance": [
+        "A human has reviewed the new architecture and layering",
+        "The test suite is meaningful and not weakened",
+        "No business logic remains in app/",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}

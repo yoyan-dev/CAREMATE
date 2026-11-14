@@ -1,0 +1,160 @@
+{
+  "phase": 4,
+  "name": "Personalization",
+  "goal": "Add local profile, reminders, favorites, structured triage, and consent-based analytics.",
+  "tasks": [
+    {
+      "id": "P4-01",
+      "title": "Add a local health profile",
+      "priority": "P1",
+      "dependsOn": ["P3-07"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "src/features/profile/profile.store.ts",
+        "src/data/repositories/profile.repository.ts",
+        "app/profile.tsx",
+        "__tests__/profile.test.ts"
+      ],
+      "acceptance": [
+        "Age band, allergies, conditions, and medications are stored locally",
+        "Profile data is never sent to AI without explicit consent",
+        "Users can edit and delete the profile",
+        "At least five tests cover persistence, consent, and deletion"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/profile/profile.store.ts" },
+        { "type": "fileExists", "path": "src/data/repositories/profile.repository.ts" },
+        { "type": "fileExists", "path": "app/profile.tsx" },
+        { "type": "fileExists", "path": "__tests__/profile.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/profile.test.ts", "min": 5 },
+        { "type": "command", "name": "profile-tests", "cmd": "npm test -- --runInBand profile", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P4-02",
+      "title": "Add medication reminders with local notifications",
+      "priority": "P1",
+      "dependsOn": ["P3-07"],
+      "humanGate": false,
+      "estimatedMinutes": 150,
+      "scope": [
+        "src/features/reminders/reminders.store.ts",
+        "src/services/notifications/notifications.ts",
+        "app/reminders.tsx",
+        "__tests__/reminders.test.ts"
+      ],
+      "acceptance": [
+        "Reminders can be created, edited, enabled, and disabled",
+        "Schedules survive app restart",
+        "Notification permission denial is handled gracefully",
+        "At least six tests cover scheduling, persistence, and permission denial"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/reminders/reminders.store.ts" },
+        { "type": "fileExists", "path": "src/services/notifications/notifications.ts" },
+        { "type": "fileExists", "path": "app/reminders.tsx" },
+        { "type": "fileExists", "path": "__tests__/reminders.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/reminders.test.ts", "min": 6 },
+        { "type": "command", "name": "reminders-tests", "cmd": "npm test -- --runInBand reminders", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P4-03",
+      "title": "Add saved guides and recent activity",
+      "priority": "P1",
+      "dependsOn": ["P2-07"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "src/features/guides/favorites.store.ts",
+        "src/features/guides/components/favorite-button.tsx",
+        "app/(tabs)/home.tsx",
+        "__tests__/favorites.test.tsx"
+      ],
+      "acceptance": [
+        "Users can favorite and unfavorite guides",
+        "Favorites appear on Home and in Guides",
+        "Recent activity shows the last viewed guides",
+        "At least four tests cover favorite, unfavorite, and recents"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/guides/favorites.store.ts" },
+        { "type": "fileExists", "path": "src/features/guides/components/favorite-button.tsx" },
+        { "type": "fileExists", "path": "__tests__/favorites.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/favorites.test.tsx", "min": 4 },
+        { "type": "command", "name": "favorites-tests", "cmd": "npm test -- --runInBand favorites", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P4-04",
+      "title": "Add a structured symptom checker before AI",
+      "priority": "P1",
+      "dependsOn": ["P3-01", "P3-02"],
+      "humanGate": false,
+      "estimatedMinutes": 150,
+      "scope": [
+        "src/features/triage/symptom-checker.tsx",
+        "src/features/triage/triage-rules.ts",
+        "app/triage.tsx",
+        "__tests__/triage.test.ts"
+      ],
+      "acceptance": [
+        "A short questionnaire asks about red-flag symptoms",
+        "Red flags route directly to the emergency screen",
+        "Non-red-flag results produce a safe summary for the AI",
+        "At least eight tests cover routing and edge cases"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/features/triage/symptom-checker.tsx" },
+        { "type": "fileExists", "path": "src/features/triage/triage-rules.ts" },
+        { "type": "fileExists", "path": "app/triage.tsx" },
+        { "type": "fileExists", "path": "__tests__/triage.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/triage.test.ts", "min": 8 },
+        { "type": "command", "name": "triage-tests", "cmd": "npm test -- --runInBand triage", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P4-05",
+      "title": "Add consent-based analytics",
+      "priority": "P2",
+      "dependsOn": ["P2-08"],
+      "humanGate": false,
+      "estimatedMinutes": 75,
+      "scope": [
+        "src/services/analytics/analytics.ts",
+        "src/features/settings/components/settings-screen.tsx",
+        "__tests__/analytics.test.ts"
+      ],
+      "acceptance": [
+        "Analytics is off by default and opt-in",
+        "Events never include message bodies or health details",
+        "Users can withdraw consent and clear local analytics",
+        "At least four tests cover consent, redaction, and withdrawal"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/services/analytics/analytics.ts" },
+        { "type": "fileExists", "path": "__tests__/analytics.test.ts" },
+        { "type": "fileContains", "path": "src/features/settings/components/settings-screen.tsx", "pattern": "analytics" },
+        { "type": "minTestCount", "path": "__tests__/analytics.test.ts", "min": 4 },
+        { "type": "command", "name": "analytics-tests", "cmd": "npm test -- --runInBand analytics", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P4-06",
+      "title": "Phase 4 review",
+      "priority": "P1",
+      "dependsOn": ["P4-01", "P4-02", "P4-03", "P4-04", "P4-05"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 30,
+      "scope": ["loop/PROGRESS.md", "src/features/profile/**", "src/features/reminders/**"],
+      "acceptance": [
+        "A human has created a profile, reminder, favorite, and triage run",
+        "No health data leaves the device without consent",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}

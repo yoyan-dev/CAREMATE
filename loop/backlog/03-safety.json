@@ -1,0 +1,172 @@
+{
+  "phase": 3,
+  "name": "Safety and emergency",
+  "goal": "Make the product safe to ship with deterministic red flags, emergency escalation, legal copy, and adversarial tests.",
+  "tasks": [
+    {
+      "id": "P3-01",
+      "title": "Implement deterministic red-flag detection",
+      "priority": "P0",
+      "dependsOn": ["P2-11"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "src/lib/red-flags.ts",
+        "src/features/chat/use-safety.ts",
+        "__tests__/red-flags.test.ts"
+      ],
+      "acceptance": [
+        "Chest pain, breathing difficulty, stroke signs, severe bleeding, anaphylaxis, suicidal ideation, pregnancy emergencies, and infant emergencies are detected",
+        "Detection is case-insensitive and handles common phrasing",
+        "Each match returns a reason and recommended action",
+        "At least twelve tests cover positive and negative cases"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/lib/red-flags.ts" },
+        { "type": "fileExists", "path": "src/features/chat/use-safety.ts" },
+        { "type": "fileExists", "path": "__tests__/red-flags.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/red-flags.test.ts", "min": 12 },
+        { "type": "command", "name": "red-flag-tests", "cmd": "npm test -- --runInBand red-flags", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P3-02",
+      "title": "Build the emergency screen",
+      "priority": "P0",
+      "dependsOn": ["P3-01"],
+      "humanGate": false,
+      "estimatedMinutes": 150,
+      "scope": [
+        "app/emergency.tsx",
+        "src/features/emergency/emergency-screen.tsx",
+        "src/features/emergency/use-emergency.ts",
+        "__tests__/emergency.test.tsx"
+      ],
+      "acceptance": [
+        "Emergency screen is reachable in two taps from any tab",
+        "It shows region-aware emergency numbers and a call button",
+        "It includes a CPR metronome timer and a do-not-do list",
+        "Location sharing is opt-in and clearly explained",
+        "At least five tests cover reachability, calling, timer, and permission denial"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "app/emergency.tsx" },
+        { "type": "fileExists", "path": "src/features/emergency/emergency-screen.tsx" },
+        { "type": "fileExists", "path": "__tests__/emergency.test.tsx" },
+        { "type": "minTestCount", "path": "__tests__/emergency.test.tsx", "min": 5 },
+        { "type": "command", "name": "emergency-tests", "cmd": "npm test -- --runInBand emergency", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P3-03",
+      "title": "Add safety prompt assembly and output checks",
+      "priority": "P0",
+      "dependsOn": ["P3-01", "P1-09"],
+      "humanGate": false,
+      "estimatedMinutes": 120,
+      "scope": [
+        "src/services/ai/safety.ts",
+        "src/services/ai/prompts/system.md",
+        "__tests__/safety.test.ts"
+      ],
+      "acceptance": [
+        "The system prompt forbids diagnosis, prescriptions, and dosages",
+        "Output checks detect dosages, diagnoses, and unsafe instructions",
+        "Red flags prepend emergency instructions",
+        "At least eight tests cover refusals and escalations"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "src/services/ai/safety.ts" },
+        { "type": "fileExists", "path": "src/services/ai/prompts/system.md" },
+        { "type": "fileExists", "path": "__tests__/safety.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/safety.test.ts", "min": 8 },
+        { "type": "command", "name": "safety-tests", "cmd": "npm test -- --runInBand safety", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P3-04",
+      "title": "Add disclaimer, privacy policy, and terms",
+      "priority": "P0",
+      "dependsOn": ["P2-11"],
+      "humanGate": false,
+      "estimatedMinutes": 60,
+      "scope": [
+        "docs/legal/DISCLAIMER.md",
+        "docs/legal/PRIVACY.md",
+        "docs/legal/TERMS.md",
+        "src/features/legal/legal-screen.tsx"
+      ],
+      "acceptance": [
+        "Disclaimer says general guidance only, not diagnosis or prescription",
+        "Privacy policy covers local storage, AI processing, and deletion",
+        "Terms include emergency and limitation-of-liability language",
+        "Legal screens are reachable from Settings and onboarding"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "docs/legal/DISCLAIMER.md" },
+        { "type": "fileExists", "path": "docs/legal/PRIVACY.md" },
+        { "type": "fileExists", "path": "docs/legal/TERMS.md" },
+        { "type": "fileContains", "path": "docs/legal/DISCLAIMER.md", "pattern": "not a diagnosis|not medical advice" },
+        { "type": "fileExists", "path": "src/features/legal/legal-screen.tsx" }
+      ]
+    },
+    {
+      "id": "P3-05",
+      "title": "Medical content review sign-off",
+      "priority": "P0",
+      "dependsOn": ["P2-06", "P3-04"],
+      "humanGate": true,
+      "blocking": false,
+      "estimatedMinutes": 120,
+      "scope": ["docs/CONTENT_REVIEW.md", "src/data/seed/guides/**"],
+      "acceptance": [
+        "A qualified reviewer has reviewed every first-aid guide",
+        "Emergency triggers and do-not-do lists are accurate for the target region",
+        "Sources and review dates are recorded",
+        "The sign-off is documented in docs/CONTENT_REVIEW.md"
+      ],
+      "checks": []
+    },
+    {
+      "id": "P3-06",
+      "title": "Add adversarial safety tests",
+      "priority": "P0",
+      "dependsOn": ["P3-03"],
+      "humanGate": false,
+      "estimatedMinutes": 90,
+      "scope": [
+        "__tests__/safety/adversarial.test.ts",
+        "docs/AI_SAFETY.md"
+      ],
+      "acceptance": [
+        "Tests attempt to extract diagnoses, dosages, and unsafe instructions",
+        "At least ten adversarial cases are covered",
+        "The suite asserts refusal or escalation for each case",
+        "The safety document explains the pipeline and limitations"
+      ],
+      "checks": [
+        { "type": "fileExists", "path": "__tests__/safety/adversarial.test.ts" },
+        { "type": "minTestCount", "path": "__tests__/safety/adversarial.test.ts", "min": 10 },
+        { "type": "fileExists", "path": "docs/AI_SAFETY.md" },
+        { "type": "command", "name": "adversarial-tests", "cmd": "npm test -- --runInBand adversarial", "timeoutMs": 300000 }
+      ]
+    },
+    {
+      "id": "P3-07",
+      "title": "Phase 3 review",
+      "priority": "P0",
+      "dependsOn": ["P3-01", "P3-02", "P3-03", "P3-04", "P3-05", "P3-06"],
+      "humanGate": true,
+      "blocking": true,
+      "estimatedMinutes": 45,
+      "scope": ["loop/PROGRESS.md", "docs/legal/**", "docs/CONTENT_REVIEW.md"],
+      "acceptance": [
+        "A human has triggered every red flag and confirmed escalation",
+        "The emergency screen works offline",
+        "Legal copy is approved for the launch region",
+        "The reviewer signs off in loop/ESCALATIONS.md"
+      ],
+      "checks": []
+    }
+  ]
+}
