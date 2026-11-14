@@ -232,6 +232,8 @@ npm run loop:status
 
 ### Approve a human gate
 
+Run this on the `loop/dev` branch (the branch the loop creates):
+
 ```bash
 npm run loop:approve -- P0-09 "Reviewed on device; mic and chat work."
 ```

@@ -2,7 +2,9 @@
 import {
   appendProgress,
   commitControllerState,
+  currentBranch,
   loadBacklog,
+  loadConfig,
   loadState,
   nowIso,
   saveState,
@@ -30,6 +32,13 @@ if (!taskId || taskId === "--help" || taskId === "-h") {
 }
 
 const root = process.cwd();
+const config = loadConfig(root);
+const branch = currentBranch(root);
+if (config.git?.branch && branch !== config.git.branch) {
+  console.error(`Retries must run on ${config.git.branch}; current branch is ${branch}.`);
+  process.exit(1);
+}
+
 const state = loadState(root);
 const tasks = loadBacklog(root);
 const task = tasks.find((entry) => entry.id === taskId);

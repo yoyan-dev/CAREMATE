@@ -12,7 +12,7 @@ npm run loop:once        # run one task
 npm run loop             # run a budgeted batch
 ```
 
-Approve a human gate:
+Approve a human gate (run this on the `loop/dev` branch):
 
 ```bash
 npm run loop:approve -- P0-09 "Reviewed on device"
